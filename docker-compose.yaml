@@ -157,14 +157,14 @@ services:
       start_period: 30s
     restart: always
  
-  airflow-apiserver:
+  airflow-webserver:
     <<: *airflow-common
-    command: api-server
+    command: webserver
     container_name: airflow-webserver
     ports:
       - "8080:8080"
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -216,7 +216,7 @@ services:
  
   # airflow-triggerer:
   #   <<: *airflow-common
-  #   command: triggerere
+  #   command: triggerer
   #   container_name: airflow-triggerer
   #   healthcheck:
   #     test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']

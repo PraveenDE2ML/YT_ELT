@@ -1,7 +1,8 @@
+# airflow dag
 import requests
 import json
 # import os
-
+# airflow dag
 from datetime import date
 # from dotenv import load_dotenv
 # load_dotenv(dotenv_path="./.env") #set the dotenv path
@@ -9,16 +10,16 @@ from datetime import date
 # CHANNEL_HANDLE = os.getenv("CHANNEL_HANDLE")
 
 from airflow.decorators import task, dag
-from airflow.variables import Variable
+from airflow.models.variable import Variable
 
-API_KEY = Variable.get("API_KEY ")
-CHANNEL_HANDLE = Variable.get("CHANNEL_HANDLE")
 
 maxresults = 50
 
 @task
 def get_playlist_id():
     try: 
+        API_KEY = Variable.get("API_KEY")
+        CHANNEL_HANDLE = Variable.get("CHANNEL_HANDLE")
         url = f'https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle={CHANNEL_HANDLE}&key={API_KEY}'
 
         response = requests.get(url)
@@ -37,7 +38,8 @@ def get_playlist_id():
 
 @task
 def get_video_ids(playlistId):  
-    
+    API_KEY = Variable.get("API_KEY")
+    CHANNEL_HANDLE = Variable.get("CHANNEL_HANDLE")
     video_ids = []
 
     pageToken = None
@@ -75,7 +77,8 @@ def get_video_ids(playlistId):
 @task
 def get_video_details(video_ids):
     extracted_data = []
-
+    API_KEY = Variable.get("API_KEY")
+    CHANNEL_HANDLE = Variable.get("CHANNEL_HANDLE")
     def batch_list(video_id_lst, batch_size):
         for i in range(0, len(video_id_lst), batch_size):
             yield video_id_lst[i:i+batch_size] #get the sub-list of video_ids equal to batch size
@@ -110,7 +113,8 @@ def get_video_details(video_ids):
 @task
 def save_to_json(extracted_data):
     file_path = f"./data/video_stats_{date.today()}.json" #file path with current date
-    
+    API_KEY = Variable.get("API_KEY")
+    CHANNEL_HANDLE = Variable.get("CHANNEL_HANDLE")    
     #context manager to handle file operations like open,close and write
     with open(file_path, "w", encoding="utf-8") as json_file: #open file in write mode with utf-8 encoding, 'w' indicates write mode
         json.dump(extracted_data, json_file, indent=4,ensure_ascii=False) #dump data to json file with indentation of 4 spaces
